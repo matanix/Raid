@@ -6,10 +6,11 @@
 #define MAIN_SUCCESS 0
 
 SOCKET g_sock = INVALID_SOCKET;
+SOCKET g_conn = INVALID_SOCKET;
 
-static EResult initializeAgent()
+static EResult initializeStation()
 {
-    if (Socket_OpenClientSocket(&g_sock) != eResult_Success)
+    if (Socket_OpenServerSocket(&g_sock, &g_conn) != eResult_Success)
     {
         RAID_ERROR("Failed to open socket");
         goto error_cleanup;
@@ -26,18 +27,19 @@ static EResult initializeAgent()
         return eResult_Failure;
 }
 
+
 int main(int argc, char* argv[])
 {
-    RAID_INFO("Initializing agent");
-    if (initializeAgent() != eResult_Success)
+    RAID_INFO("Initializing station");
+    if (initializeStation() != eResult_Success)
     {
-        RAID_ERROR("Failed to initialize agent");
+        RAID_ERROR("Failed to initialize station");
         goto main_err;
     }
-    RAID_INFO("Agent initialized");
+    RAID_INFO("Station initialized");
 
-    RAID_INFO("Checking RaidProtocol sanity vs server");
-    if (RaidProtocol_ClientSanity(g_sock) != eResult_Success)
+    RAID_INFO("Checking RaidProtocol sanity vs client");
+    if (RaidProtocol_ServerSanity(g_conn) != eResult_Success)
     {
         RAID_ERROR("Communication sanity failed");
         goto main_err;
