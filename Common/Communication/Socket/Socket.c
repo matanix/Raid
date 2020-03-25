@@ -118,6 +118,18 @@ EResult Socket_OpenServerSocket(SOCKET* o_newSocket, SOCKET* o_newConnection)
 
 EResult Socket_Send(SOCKET mySock, const char* buf, int len)
 {
+    if (mySock == INVALID_SOCKET)
+    {
+        RAID_ERROR("Invalid socket");
+        return eResult_Failure;
+    }
+
+    if (buf == NULL)
+    {
+        RAID_ERROR("Null buff");
+        return eResult_Failure;
+    }
+
     if (send(mySock, buf, len, NO_SEND_FLAGS) < 0)
     {
         RAID_ERROR("Socket send failed: %d" , WSAGetLastError());
@@ -129,6 +141,24 @@ EResult Socket_Send(SOCKET mySock, const char* buf, int len)
 
 EResult Socket_Recv(SOCKET mySock, char* o_buf, int len, int* o_recv, int timeout)
 {
+    if (mySock == INVALID_SOCKET)
+    {
+        RAID_ERROR("Invalid socket.");
+        return eResult_Failure;
+    }
+
+    if (o_buf == NULL)
+    {
+        RAID_ERROR("Null buff");
+        return eResult_Failure;
+    }
+
+    if (o_recv == NULL)
+    {
+        RAID_ERROR("Null o_recv");
+        return eResult_Failure;
+    }
+
     DWORD actualTimeout = timeout * MILLISECONDS_IN_SECOND;
     setsockopt(mySock, SOL_SOCKET, SO_RCVTIMEO, (char*)&actualTimeout, sizeof(actualTimeout));
 
