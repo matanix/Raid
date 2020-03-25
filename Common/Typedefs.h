@@ -12,7 +12,8 @@ typedef enum { false = 0, true = 1} bool;
 typedef enum
 {
     eResult_Success = 0,
-    eResult_Failure
+    eResult_Failure,
+    eResult_Timeout
 } EResult;
 
 #endif //COMMON_TYPEDEFS_H

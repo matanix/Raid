@@ -137,15 +137,12 @@ EResult Socket_Recv(SOCKET mySock, char* o_buf, int len, int* o_recv, int timeou
     {
         *o_recv = 0;
 
-        if (WSAGetLastError() != WSAETIMEDOUT)
+        if (WSAGetLastError() == WSAETIMEDOUT)
         {
-            RAID_ERROR("Socket recv timed out");
-        }
-        else
-        {
-            RAID_ERROR("Socket error failed with : %d" , WSAGetLastError());
+            return eResult_Timeout;
         }
 
+        RAID_ERROR("Socket error failed with : %d" , WSAGetLastError());
         return eResult_Failure;
     }
 

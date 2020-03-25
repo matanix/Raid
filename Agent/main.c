@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "Communication/Socket/Socket.h"
 #include "Communication/RaidProtocol/RaidProtocol.h"
+#include "RaidAgent/RaidAgent.h"
 
 #define MAIN_ERROR -1
 #define MAIN_SUCCESS 0
@@ -44,6 +45,11 @@ int main(int argc, char* argv[])
     }
     RAID_INFO("---------Sanity success-------------");
 
+    if (RaidAgent_Run() != eResult_Success)
+    {
+        RAID_ERROR("Failed to run RaidAgent");
+        goto main_err;
+    }
 
     WAIT_FOR_KEY_PRESS();
     return MAIN_SUCCESS;
