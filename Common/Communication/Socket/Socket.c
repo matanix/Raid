@@ -47,7 +47,7 @@ EResult socket_openSocket(SOCKET* o_newSocket)
     return eResult_Success;
 }
 
-EResult Socket_OpenClientSocket(SOCKET* o_newSocket)
+EResult Socket_OpenClientSocket(SOCKET* o_newSocket, unsigned short port)
 {
     RAID_INFO("Opening socket");
     if (socket_openSocket(o_newSocket) != eResult_Success)
@@ -60,7 +60,7 @@ EResult Socket_OpenClientSocket(SOCKET* o_newSocket)
     int retCode = SOCKET_ERROR;
 
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(DEFAULT_PORT);
+    serverAddr.sin_port = htons(port);
     serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
     RAID_INFO("Connecting socket");
@@ -74,7 +74,7 @@ EResult Socket_OpenClientSocket(SOCKET* o_newSocket)
     return eResult_Success;
 }
 
-EResult Socket_OpenServerSocket(SOCKET* o_newSocket, SOCKET* o_newConnection)
+EResult Socket_OpenServerSocket(SOCKET* o_newSocket, SOCKET* o_newConnection, unsigned short port)
 {
     SOCKADDR_IN serverAddr, clientInfo;
     int clientInfoLen = sizeof(clientInfo);
@@ -88,7 +88,7 @@ EResult Socket_OpenServerSocket(SOCKET* o_newSocket, SOCKET* o_newConnection)
 
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    serverAddr.sin_port = htons(DEFAULT_PORT);
+    serverAddr.sin_port = htons(port);
 
     RAID_INFO("Binding socket");
     if (bind(*o_newSocket, (SOCKADDR*)&serverAddr, sizeof(serverAddr)) != 0)

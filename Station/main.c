@@ -11,7 +11,7 @@ SOCKET g_conn = INVALID_SOCKET;
 
 static EResult initializeStation()
 {
-    if (Socket_OpenServerSocket(&g_sock, &g_conn) != eResult_Success)
+    if (Socket_OpenServerSocket(&g_sock, &g_conn, RAID_PORT) != eResult_Success)
     {
         RAID_ERROR("Failed to open socket");
         goto error_cleanup;
