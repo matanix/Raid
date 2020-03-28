@@ -12,3 +12,6 @@ set(RaidStation $(STATION_SOURCES))
 
 add_executable(RaidAgent ${AGENT_SOURCES})
 add_executable(RaidStation ${STATION_SOURCES})
+
+target_include_directories(RaidAgent PUBLIC Agent)
+target_include_directories(RaidStation PUBLIC Station)

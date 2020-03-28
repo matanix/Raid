@@ -15,8 +15,10 @@ typedef enum
 {
     eRaidMessageType_Min = 0,
     eRaidMessageType_KeepAlive = eRaidMessageType_Min,
-    eRaidMessageType_GeneralInfo,
-    eRaidMessageType_Max = eRaidMessageType_GeneralInfo
+    eRaidMessageType_GeneralInfoRequest,
+    eRaidMessageType_GeneralInfoResponse,
+    eRaidMessageType_Max = eRaidMessageType_GeneralInfoResponse,
+    eRaidMessageType_Count
 } RaidMessageType;
 
 
@@ -41,10 +43,10 @@ EResult RaidProtocol_ClientSanity(SOCKET mySock);
 EResult RaidProtocol_ServerSanity(SOCKET mySock);
 EResult RaidProtocol_VerifyMessage(const char* buf, int size);
 EResult RaidProtocol_SendKeepAlive(SOCKET mySock);
+EResult RaidProtocol_SendMessage(SOCKET mySock, RaidMessageType messageType, const char* payload, int payloadSize);
 /****************************/
 
 /** Private RaidProtocol functions **/
-EResult raidProtocol_sendMessage(SOCKET mySock, RaidMessageType messageType, int payloadSize, const char* payload);
 /*****************************/
 
 #endif //COMMON_COMMUNICATION_RAIDPROTOCOL_RAIDPROTOCOL_H

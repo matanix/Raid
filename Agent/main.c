@@ -45,6 +45,12 @@ int main(int argc, char* argv[])
     }
     RAID_INFO("---------Sanity success-------------");
 
+    if (RaidAgent_Init() != eResult_Success)
+    {
+        RAID_ERROR("Failed to initialize RaidAgent");
+        goto main_err;
+    }
+
     if (RaidAgent_Run() != eResult_Success)
     {
         RAID_ERROR("Failed to run RaidAgent");

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "Communication/Socket/Socket.h"
 #include "Communication/RaidProtocol/RaidProtocol.h"
+#include "RaidStation/RaidStation.h"
 
 #define MAIN_ERROR -1
 #define MAIN_SUCCESS 0
@@ -45,6 +46,18 @@ int main(int argc, char* argv[])
         goto main_err;
     }
     RAID_INFO("---------Sanity success-------------");
+
+    if (RaidStation_Init() != eResult_Success)
+    {
+        RAID_ERROR("Failed to initialize RaidAgent");
+        goto main_err;
+    }
+
+    if (RaidStation_Run() != eResult_Success)
+    {
+        RAID_ERROR("Failed to run RaidAgent");
+        goto main_err;
+    }
 
 
     WAIT_FOR_KEY_PRESS();

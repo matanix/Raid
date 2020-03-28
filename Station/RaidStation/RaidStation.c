@@ -1,20 +1,21 @@
-#include "RaidAgent.h"
+#include "RaidStation.h"
 
 extern SOCKET g_sock;
-static SYSTEMTIME g_lastKA;
 static MessageHandler g_messageHandlersArray[eRaidMessageType_Count];
 static bool g_isInit = false;
 
-#define FILE_TIME_TO_SECONDS_MUL 10000000LLU
-
-EResult RaidAgent_Init()
+EResult RaidStation_Init()
 {
+    if (raidStation_createCommandManagerThread() != eResult_Success)
+    {
+        RAID_ERROR("Failed to create input manager thread");
+        return eResult_Failure;
+    }
+
     //Set to null handlers.
     memset(g_messageHandlersArray, 0, sizeof(g_messageHandlersArray));
 
     /** Initialize the raid message handlers. **/
-    g_messageHandlersArray[eRaidMessageType_GeneralInfoRequest].validateFunc = Messages_GeneralInfoRequest_Validate;
-    g_messageHandlersArray[eRaidMessageType_GeneralInfoRequest].executeFunc = Messages_GeneralInfoRequest_Execute;
     /******************************************/
 
     //Give the array to the message handler.
@@ -28,11 +29,11 @@ EResult RaidAgent_Init()
     return eResult_Success;
 }
 
-EResult RaidAgent_Run()
+EResult RaidStation_Run()
 {
     if (g_isInit == false)
     {
-        RAID_ERROR("Raid agent wasn't initialized");
+        RAID_ERROR("Raid station wasn't initialized");
         return eResult_Failure;
     }
 
@@ -45,17 +46,15 @@ EResult RaidAgent_Run()
         return eResult_Failure;
     }
 
-    GetLocalTime(&g_lastKA);
-
     while (true)
     {
         memset(buf, 0, sizeof(RaidMessage));
         recvSize = 0;
-        switch(Socket_Recv(g_sock, buf, sizeof(RaidMessage), &recvSize, RAIDAGENT_KEEPALIVE_TIME))
+        switch(Socket_Recv(g_sock, buf, sizeof(RaidMessage), &recvSize, RAIDSTATION_SOCKET_TIMEOUT))
         {
             case (eResult_Success):
             {
-                if (raidAgent_handleRaidMessage(buf, recvSize) == eResult_Failure)
+                if (raidStation_handleRaidMessage(buf, recvSize) == eResult_Failure)
                 {
                     RAID_ERROR("Failed to handle raid message");
                 }
@@ -77,20 +76,14 @@ EResult RaidAgent_Run()
             default:
             {
                 RAID_ERROR("Unexpected return value from Socket_Recv");
-                break;
             }
-        }
-
-        if (raidAgent_updateKATime() != eResult_Success)
-        {
-            RAID_ERROR("Failed to update / handle KA time");
         }
     }
 
     return eResult_Success;
 }
 
-EResult raidAgent_handleRaidMessage(const char* buf, int size)
+EResult raidStation_handleRaidMessage(const char* buf, int size)
 {
     if (buf == NULL)
     {
@@ -121,36 +114,8 @@ EResult raidAgent_handleRaidMessage(const char* buf, int size)
     return eResult_Success;
 }
 
-EResult raidAgent_updateKATime()
+EResult raidStation_createCommandManagerThread()
 {
-    SYSTEMTIME curTime;
-    GetLocalTime(&curTime);
-
-    FILETIME curFileTime, lastKAFileTime;
-
-    if (SystemTimeToFileTime(&curTime, &curFileTime) == 0)
-    {
-        RAID_ERROR("Failed to convert curTime to file time");
-        return eResult_Failure;
-    }
-
-    if (SystemTimeToFileTime(&g_lastKA, &lastKAFileTime) == 0)
-    {
-        RAID_ERROR("Failed to convert g_lastKA to file time");
-        return eResult_Failure;
-    }
-
-    if ((((ULARGE_INTEGER *)&curFileTime)->QuadPart - ((ULARGE_INTEGER *)&lastKAFileTime)->QuadPart) / FILE_TIME_TO_SECONDS_MUL >= RAIDAGENT_KEEPALIVE_TIME)
-    {
-        RAID_INFO("RAIDAGENT_KEEPALIVE_TIME has passed since last KA - Sending keep alive");
-        memcpy(&g_lastKA, &curTime, sizeof(SYSTEMTIME));
-
-        if (RaidProtocol_SendKeepAlive(g_sock) != eResult_Success)
-        {
-            RAID_ERROR("Failed to send keep alive");
-            return eResult_Failure;
-        }
-    }
-
+    //Create input manager thread. create an IPC and use it in the main thread for command managing
     return eResult_Success;
 }
