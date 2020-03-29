@@ -19,13 +19,13 @@ typedef enum
     eRaidMessageType_GeneralInfoResponse,
     eRaidMessageType_Max = eRaidMessageType_GeneralInfoResponse,
     eRaidMessageType_Count
-} RaidMessageType;
+} ERaidMessageType;
 
 
 typedef struct
 {
     int magic;
-    RaidMessageType messageType;
+    ERaidMessageType messageType;
     SYSTEMTIME time;
     int payloadSize;
 } RaidMessageHeader;
@@ -43,7 +43,7 @@ EResult RaidProtocol_ClientSanity(SOCKET mySock);
 EResult RaidProtocol_ServerSanity(SOCKET mySock);
 EResult RaidProtocol_VerifyMessage(const char* buf, int size);
 EResult RaidProtocol_SendKeepAlive(SOCKET mySock);
-EResult RaidProtocol_SendMessage(SOCKET mySock, RaidMessageType messageType, const char* payload, int payloadSize);
+EResult RaidProtocol_SendMessage(SOCKET mySock, ERaidMessageType messageType, const char* payload, int payloadSize);
 /****************************/
 
 /** Private RaidProtocol functions **/

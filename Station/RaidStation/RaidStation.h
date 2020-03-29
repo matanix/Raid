@@ -5,7 +5,7 @@
 #include "MessageHandler/MessageHandler.h"
 
 #define RAID_STATION_SOCKET_TIMEOUT     (15)
-#define RAID_STATION_CONNECTIONS_COUNT  (2)
+
 /** Public RaidStation functions **/
 EResult RaidStation_Init();
 EResult RaidStation_Run();

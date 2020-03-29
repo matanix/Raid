@@ -66,7 +66,7 @@ EResult RaidProtocol_ServerSanity(SOCKET mySock)
     return eResult_Success;
 }
 
-EResult RaidProtocol_SendMessage(SOCKET mySock, RaidMessageType messageType, const char* payload, int payloadSize)
+EResult RaidProtocol_SendMessage(SOCKET mySock, ERaidMessageType messageType, const char* payload, int payloadSize)
 {
     if (mySock == INVALID_SOCKET)
     {

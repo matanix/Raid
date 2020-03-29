@@ -5,8 +5,8 @@
 #include "Log.h"
 #include "Communication/Socket/Socket.h"
 
-#define COMMAND_MANAGER_MAX_COMMAND_SIZE (50)
-#define STATION_COMMAND_PORT (9082)
+#define COMMAND_MANAGER_MAX_COMMAND_SIZE    (200)
+#define STATION_COMMAND_PORT                (9082)
 
 /** Public CommandManager functions **/
 unsigned long WINAPI CommandManager_ThreadEntry(void* params);
