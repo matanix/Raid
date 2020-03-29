@@ -10,7 +10,7 @@ SOCKET g_sock = INVALID_SOCKET;
 
 static EResult initializeAgent()
 {
-    if (Socket_OpenClientSocket(&g_sock) != eResult_Success)
+    if (Socket_OpenClientSocket(&g_sock, RAID_PORT) != eResult_Success)
     {
         RAID_ERROR("Failed to open socket");
         goto error_cleanup;

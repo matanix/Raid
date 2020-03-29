@@ -5,12 +5,12 @@
 
 static SOCKET g_stationSock = INVALID_SOCKET;
 
-void CommandManager_ThreadEntry()
+unsigned long WINAPI CommandManager_ThreadEntry(void* params)
 {
-    if (Socket_OpenClientSocket(g_stationSock, STATION_COMMAND_PORT) != eResult_Success)
+    if (Socket_OpenClientSocket(&g_stationSock, STATION_COMMAND_PORT) != eResult_Success)
     {
         RAID_ERROR("Failed to open command manager client socket");
-        return;
+        return THREAD_ERROR;
     }
 
     char command[COMMAND_MANAGER_MAX_COMMAND_SIZE] = {0};
@@ -38,17 +38,34 @@ void CommandManager_ThreadEntry()
             continue;
         }
     }
+
+    return THREAD_SUCCESS;
 }
 
 EResult commandManager_getCommand(char* o_command, int* o_commandSize)
 {
+    RAID_INFO("waiting for command");
+    if (fgets(o_command, COMMAND_MANAGER_MAX_COMMAND_SIZE, stdin) == NULL)
+    {
+        RAID_ERROR("fgets failed.");
+        return eResult_Failure;
+    }
+
+    *o_commandSize = strnlen(o_command, COMMAND_MANAGER_MAX_COMMAND_SIZE);
     return eResult_Success;
 }
-EResult commandManager_verifyCommand(char command, int commandSize)
+EResult commandManager_verifyCommand(char* command, int commandSize)
 {
     return eResult_Success;
 }
-EResult commandManager_sendCommandToStation(char command, int commandSize)
+EResult commandManager_sendCommandToStation(char* command, int commandSize)
 {
+    if (Socket_Send(g_stationSock, command, commandSize) != eResult_Success)
+    {
+        RAID_ERROR("Failed to send command to station");
+        return eResult_Failure;
+    }
+
+    RAID_INFO("Sent command to station");
     return eResult_Success;
 }

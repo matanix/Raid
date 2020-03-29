@@ -3,9 +3,12 @@
 
 #include <stdio.h>
 
-#define WAIT_FOR_KEY_PRESS() getchar()
-#define NULL_TERMINATOR_SIZE (1)
-#define NULL_TERMINATOR ('\0')
+#define WAIT_FOR_KEY_PRESS()    getchar()
+#define NULL_TERMINATOR_SIZE    (1)
+#define NULL_TERMINATOR         ('\0')
+
+#define THREAD_ERROR            (1)
+#define THREAD_SUCCESS          (0)
 
 typedef enum { false = 0, true = 1} bool;
 

@@ -1,7 +1,7 @@
 #include "RaidStation.h"
 #include "CommandManager/CommandManager.h"
 
-extern SOCKET g_sock;
+extern SOCKET g_conn;
 static SOCKET g_commandSock, g_commandConnection = INVALID_SOCKET;
 static MessageHandler g_messageHandlersArray[eRaidMessageType_Count];
 static bool g_isInit = false;
@@ -34,16 +34,16 @@ EResult RaidStation_Init()
 
 EResult RaidStation_Run()
 {
+    FD_SET readSet;
+    FD_ZERO(&readSet);
+
     if (g_isInit == false)
     {
         RAID_ERROR("Raid station wasn't initialized");
         return eResult_Failure;
     }
 
-    int recvSize = 0;
-    char buf[sizeof(RaidMessage)] = {0};
-
-    if (g_sock == INVALID_SOCKET)
+    if (g_conn == INVALID_SOCKET || g_commandConnection == INVALID_SOCKET)
     {
         RAID_ERROR("Received invalid socket");
         return eResult_Failure;
@@ -51,40 +51,120 @@ EResult RaidStation_Run()
 
     while (true)
     {
-        memset(buf, 0, sizeof(RaidMessage));
-        recvSize = 0;
-        switch(Socket_Recv(g_sock, buf, sizeof(RaidMessage), &recvSize, RAIDSTATION_SOCKET_TIMEOUT))
+        FD_ZERO(&readSet);
+        FD_SET(g_conn, &readSet);
+        FD_SET(g_commandConnection, &readSet);
+
+        if (select(0, &readSet, NULL, NULL, NULL) == SOCKET_ERROR)
         {
-            case (eResult_Success):
-            {
-                if (raidStation_handleRaidMessage(buf, recvSize) == eResult_Failure)
-                {
-                    RAID_ERROR("Failed to handle raid message");
-                }
-                break;
-            }
+            RAID_ERROR("Select failed");
+            continue;
+        }
 
-            case (eResult_Timeout):
+        if (FD_ISSET(g_conn, &readSet))
+        {
+            if (raidStation_handleAgentSocketTrigger() != eResult_Success)
             {
-                RAID_INFO("Recv timeout.");
-                break;
+                RAID_ERROR("Failed to handle agent socket trigger");
             }
+        }
 
-            case (eResult_Failure):
+        if (FD_ISSET(g_commandConnection, &readSet))
+        {
+            if (raidStation_handleCommandSocketTrigger() != eResult_Success)
             {
-                RAID_ERROR("Recv failed");
-                break;
-            }
-
-            default:
-            {
-                RAID_ERROR("Unexpected return value from Socket_Recv");
+                RAID_ERROR("Failed to handle command socket trigger");
             }
         }
     }
 
     return eResult_Success;
 }
+
+EResult raidStation_handleAgentSocketTrigger()
+{
+    int recvSize = 0;
+    char buf[sizeof(RaidMessage)] = {0};
+
+    switch(Socket_Recv(g_conn, buf, sizeof(RaidMessage), &recvSize, RAID_STATION_SOCKET_TIMEOUT))
+    {
+        case (eResult_Success):
+        {
+            if (raidStation_handleRaidMessage(buf, recvSize) == eResult_Failure)
+            {
+                RAID_ERROR("Failed to handle raid message");
+                return eResult_Failure;
+            }
+            break;
+        }
+
+        case (eResult_Timeout):
+        {
+            RAID_INFO("Recv timeout.");
+            return eResult_Failure;
+        }
+
+        case (eResult_Failure):
+        {
+            RAID_ERROR("Recv failed");
+            return eResult_Failure;
+        }
+
+        default:
+        {
+            RAID_ERROR("Unexpected return value from Socket_Recv");
+            return eResult_Failure;
+        }
+    }
+
+    return eResult_Success;
+}
+
+EResult raidStation_handleCommandSocketTrigger()
+{
+    int recvSize = 0;
+    char buf[COMMAND_MANAGER_MAX_COMMAND_SIZE] = {0};
+
+    switch(Socket_Recv(g_commandConnection, buf, COMMAND_MANAGER_MAX_COMMAND_SIZE, &recvSize, RAID_STATION_SOCKET_TIMEOUT))
+    {
+        case (eResult_Success):
+        {
+            if (raidStation_handleCommand(buf, recvSize) != eResult_Success)
+            {
+                RAID_ERROR("Failed to handle command %s", buf);
+                return eResult_Failure;
+            }
+
+            return eResult_Success;
+        }
+
+        case (eResult_Timeout):
+        {
+            RAID_INFO("Recv timeout.");
+            return eResult_Failure;
+        }
+
+        case (eResult_Failure):
+        {
+            RAID_ERROR("Recv failed");
+            return eResult_Failure;
+        }
+
+        default:
+        {
+            RAID_ERROR("Unexpected return value from Socket_Recv");
+            return eResult_Failure;
+        }
+    }
+
+    return eResult_Success;
+}
+
+EResult raidStation_handleCommand(const char* buf, int size)
+{
+    return eResult_Success;
+}
+
 
 EResult raidStation_handleRaidMessage(const char* buf, int size)
 {
@@ -140,7 +220,7 @@ EResult raidStation_createCommandManagerThread()
         return eResult_Failure;
     }
 
-    if (Socket_OpenServerSocket(g_commandSock, g_commandConnection, STATION_COMMAND_PORT) != eResult_Success)
+    if (Socket_OpenServerSocket(&g_commandSock, &g_commandConnection, STATION_COMMAND_PORT) != eResult_Success)
     {
         RAID_ERROR("Failed to open command socket");
         return eResult_Failure;

@@ -5,10 +5,10 @@
 #include "Log.h"
 #include <winsock2.h>
 
-#define RAID_PORT (7171)
-#define NO_SEND_FLAGS (0)
-#define NO_RECV_FLAGS (0)
-#define MILLISECONDS_IN_SECOND (1000)
+#define RAID_PORT               (7171)
+#define NO_SEND_FLAGS           (0)
+#define NO_RECV_FLAGS           (0)
+#define MILLISECONDS_IN_SECOND  (1000)
 
 /** Public socket functions **/
 EResult Socket_OpenServerSocket(SOCKET* o_newSocket, SOCKET* o_newConnection, unsigned short port);
