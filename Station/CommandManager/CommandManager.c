@@ -26,6 +26,11 @@ unsigned long WINAPI CommandManager_ThreadEntry(void* params)
             continue;
         }
 
+        if (command[0] == '\n')
+        {
+            continue;
+        }
+
         if (commandManager_verifyCommand(command, commandSize) != eResult_Success)
         {
             RAID_ERROR("Failed to verify command.");
@@ -44,7 +49,6 @@ unsigned long WINAPI CommandManager_ThreadEntry(void* params)
 
 EResult commandManager_getCommand(char* o_command, int* o_commandSize)
 {
-    RAID_INFO("waiting for command");
     if (fgets(o_command, COMMAND_MANAGER_MAX_COMMAND_SIZE, stdin) == NULL)
     {
         RAID_ERROR("fgets failed.");
@@ -66,6 +70,5 @@ EResult commandManager_sendCommandToStation(char* command, int commandSize)
         return eResult_Failure;
     }
 
-    RAID_INFO("Sent command to station");
     return eResult_Success;
 }

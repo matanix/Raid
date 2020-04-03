@@ -1,5 +1,6 @@
 #include "RaidStation.h"
 #include "CommandManager/CommandManager.h"
+#include "CommandHandler/CommandHandler.h"
 
 extern SOCKET g_conn;
 static SOCKET g_commandSock, g_commandConnection = INVALID_SOCKET;
@@ -162,7 +163,7 @@ EResult raidStation_handleCommandSocketTrigger()
 
 EResult raidStation_handleCommand(const char* buf, int size)
 {
-    return eResult_Success;
+    return CommandHandler_HandleCommand(buf, size);
 }
 
 
