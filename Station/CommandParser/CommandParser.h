@@ -5,7 +5,7 @@
 #include "Communication/RaidProtocol/RaidProtocol.h"
 
 /** Public CommandParser functions **/
-EResult ParseCommand(char* io_command, int size, ParsedCommand* o_parsedCommand);
+EResult ParseCommand(const char* command, int size, ParsedCommand* o_parsedCommand);
 /****************************/
 
 #endif //STATION_COMMANDPARSER_COMMANDPARSER
