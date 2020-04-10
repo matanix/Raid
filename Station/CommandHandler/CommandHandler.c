@@ -1,10 +1,10 @@
-#include "CommandHandler.h"
+#include "GeneralInfoRequest.h"
 
 CommandNameToHandler g_namesToHandlers[] =
 {
-        {"geninf", NULL},
-        {"log", NULL},
-        { "shutdown", NULL}
+        {"geninf", CommandHandler_GeneralInfoRequest},
+        {"log", CommandHandler_Log},
+        { "shutdown", CommandHandler_Shutdown}
 };
 
 EResult CommandHandler_HandleCommand(const char* command, int size)
@@ -24,7 +24,7 @@ EResult CommandHandler_HandleCommand(const char* command, int size)
     int parseIndex = 0;
     char commandName[COMMAND_MAX_COMMAND_SIZE] = {0};
 
-    if (commandHandler_parseWord(command, size, commandName, COMMAND_MAX_COMMAND_SIZE, &parseIndex) != eResult_Success)
+    if (CommandHandler_ParseWord(command, size, commandName, COMMAND_MAX_COMMAND_SIZE, &parseIndex) != eResult_Success)
     {
         RAID_ERROR("Failed to parse word");
         return eResult_Failure;
@@ -53,7 +53,7 @@ EResult CommandHandler_HandleCommand(const char* command, int size)
     return eResult_Success;
 }
 
-EResult commandHandler_parseWord(const char* command, int size, char* o_word, int outSize, int* o_parseIndex)
+EResult CommandHandler_ParseWord(const char* command, int size, char* o_word, int outSize, int* o_parseIndex)
 {
     if (outSize == 0 || command == NULL || o_word == NULL || size == 0 || o_parseIndex == NULL)
     {

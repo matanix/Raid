@@ -229,3 +229,14 @@ EResult raidStation_createCommandManagerThread()
 
     return eResult_Success;
 }
+
+EResult RaidStation_SendMessage(ERaidMessageType messageType, const char* payload, int payloadSize)
+{
+    if (RaidProtocol_SendMessage(g_conn, messageType, payload, payloadSize) != eResult_Success)
+    {
+        RAID_ERROR("Failed to send message");
+        return eResult_Failure;
+    }
+
+    return eResult_Success;
+}

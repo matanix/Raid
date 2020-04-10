@@ -8,10 +8,10 @@ typedef EResult (*t_specificCommandHandler)(const char* payload, int payloadSize
 
 /** Public CommandHandler functions **/
 EResult CommandHandler_HandleCommand(const char* command, int size);
+EResult CommandHandler_ParseWord(const char* command, int size, char* o_word, int outSize, int* o_parseIndex);
 /****************************/
 
 /** Private CommandHandler functions **/
-EResult commandHandler_parseWord(const char* command, int size, char* o_word, int outSize, int* o_parseIndex);
 bool commandHandler_isSeperator(char c);
 EResult commandHandler_findHandler(const char* commandName, int size, t_specificCommandHandler* o_handler);
 /*************************************/

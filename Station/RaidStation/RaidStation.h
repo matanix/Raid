@@ -9,6 +9,7 @@
 /** Public RaidStation functions **/
 EResult RaidStation_Init();
 EResult RaidStation_Run();
+EResult RaidStation_SendMessage(ERaidMessageType messageType, const char* payload, int payloadSize);
 /****************************/
 
 /** Private RaidStation functions **/
