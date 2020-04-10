@@ -21,8 +21,7 @@ EResult Messages_GeneralInfoRequest_Validate(char* payload, int payloadSize)
 EResult Messages_GeneralInfoRequest_Execute(char* payload, int size)
 {
     GeneralInfoResponse response;
-
-    RAID_INFO("Hey");
+    memset(&response, 0, sizeof(GeneralInfoResponse));
 
     if (generalInfoRequest_getUserName(response.username) != eResult_Success)
     {
