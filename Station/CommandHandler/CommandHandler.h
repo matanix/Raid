@@ -7,6 +7,7 @@
 typedef EResult (*t_specificCommandHandler)(const char* payload, int payloadSize);
 
 /** Public CommandHandler functions **/
+EResult CommandHandler_Init();
 EResult CommandHandler_HandleCommand(const char* command, int size);
 EResult CommandHandler_ParseWord(const char* command, int size, char* o_word, int outSize, int* o_parseIndex);
 /****************************/

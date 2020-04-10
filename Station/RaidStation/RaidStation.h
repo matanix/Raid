@@ -3,6 +3,7 @@
 
 #include "Communication/RaidProtocol/RaidProtocol.h"
 #include "MessageHandler/MessageHandler.h"
+#include "MessageHandlers/GeneralInfoResponse/GeneralInfoResponse.h"
 
 #define RAID_STATION_SOCKET_TIMEOUT     (15)
 

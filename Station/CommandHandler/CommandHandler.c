@@ -1,14 +1,40 @@
-#include "GeneralInfoRequest.h"
+#include "CommandHandlers.h"
+
+static bool g_isInit = false;
 
 CommandNameToHandler g_namesToHandlers[] =
 {
-        {"geninf", CommandHandler_GeneralInfoRequest},
-        {"log", CommandHandler_Log},
-        { "shutdown", CommandHandler_Shutdown}
+        {"geninf", NULL},
+        {"log", NULL},
+        { "shutdown", NULL},
+        { "help", NULL}
 };
+
+EResult CommandHandler_Init()
+{
+    if (g_isInit == true)
+    {
+        RAID_ERROR("Already init");
+        return eResult_Failure;
+    }
+
+    g_namesToHandlers[0].handler = CommandHandler_GeneralInfoRequest;
+    g_namesToHandlers[1].handler = CommandHandler_Log;
+    g_namesToHandlers[2].handler = CommandHandler_Shutdown;
+    g_namesToHandlers[3].handler = CommandHandler_Help;
+
+    g_isInit = true;
+    return eResult_Success;
+}
 
 EResult CommandHandler_HandleCommand(const char* command, int size)
 {
+    if (g_isInit == false)
+    {
+        RAID_ERROR("Not init");
+        return eResult_Failure;
+    }
+
     if (command == NULL)
     {
         RAID_ERROR("Command is NULL");
@@ -55,6 +81,12 @@ EResult CommandHandler_HandleCommand(const char* command, int size)
 
 EResult CommandHandler_ParseWord(const char* command, int size, char* o_word, int outSize, int* o_parseIndex)
 {
+    if (g_isInit == false)
+    {
+        RAID_ERROR("Not init");
+        return eResult_Failure;
+    }
+
     if (outSize == 0 || command == NULL || o_word == NULL || size == 0 || o_parseIndex == NULL)
     {
         RAID_ERROR("Invalid parameter");

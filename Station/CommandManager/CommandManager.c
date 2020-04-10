@@ -31,6 +31,10 @@ unsigned long WINAPI CommandManager_ThreadEntry(void* params)
             continue;
         }
 
+        //Remove trailing \n
+        command[commandSize - 1] = NULL_TERMINATOR;
+        commandSize--;
+
         if (commandManager_verifyCommand(command, commandSize) != eResult_Success)
         {
             RAID_ERROR("Failed to verify command.");
@@ -56,6 +60,7 @@ EResult commandManager_getCommand(char* o_command, int* o_commandSize)
     }
 
     *o_commandSize = strnlen(o_command, COMMAND_MANAGER_MAX_COMMAND_SIZE);
+
     return eResult_Success;
 }
 EResult commandManager_verifyCommand(char* command, int commandSize)

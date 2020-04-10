@@ -20,12 +20,20 @@ EResult RaidStation_Init()
     memset(g_messageHandlersArray, 0, sizeof(g_messageHandlersArray));
 
     /** Initialize the raid message handlers. **/
+    g_messageHandlersArray[eRaidMessageType_GeneralInfoResponse].validateFunc = Messages_GeneralInfoResponse_Validate;
+    g_messageHandlersArray[eRaidMessageType_GeneralInfoResponse].executeFunc = Messages_GeneralInfoResponse_Execute;
     /******************************************/
 
     //Give the array to the message handler.
     if (MessageHandler_Init(g_messageHandlersArray, eRaidMessageType_Count) != eResult_Success)
     {
         RAID_ERROR("Failed to init message handler");
+        return eResult_Failure;
+    }
+
+    if (CommandHandler_Init() != eResult_Success)
+    {
+        RAID_ERROR("Failed to init command handler");
         return eResult_Failure;
     }
 

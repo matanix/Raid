@@ -5,7 +5,7 @@
 #include "MessageHandler/MessageHandler.h"
 #include "MessageHandlers/GeneralInfoRequest/GeneralInfoRequest.h"
 
-#define RAIDAGENT_KEEPALIVE_TIME (4)
+#define RAIDAGENT_KEEPALIVE_TIME (180)
 
 /** Public RaidAgent functions **/
 EResult RaidAgent_Init();
